@@ -6,7 +6,7 @@ from langchain_utils import invoke_chain
 
 # LangChainInstrumentor().instrument()
 
-openai_api_key = os.getenv("API_KEY")
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
 
 def main():

@@ -5,9 +5,13 @@ from operator import itemgetter
 from langchain.chains.openai_tools import create_extraction_chain_pydantic
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_openai import ChatOpenAI
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
-llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0)
+llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0, openai_api_key=openai_api_key)
 
 
 @st.cache_data

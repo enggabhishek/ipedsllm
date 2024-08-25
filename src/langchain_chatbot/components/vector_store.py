@@ -18,7 +18,7 @@ from langchain.chains import create_retrieval_chain
 from operator import itemgetter
 
 load_dotenv()
-openai_api_key = os.getenv("API_KEY")
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
 
 def metadata_func(record: dict, metadata: dict) -> dict:
@@ -47,7 +47,7 @@ embedding_function = OpenAIEmbeddings(
 
 
 loader = JSONLoader(
-    file_path="/Users/omkarsadekar/Documents/NEU Study Material/NEU Study Material/Capstone/ipedsllm/Data/tableinfo.json",
+    file_path="scripts/data_utils/tableinfo.json",
     jq_schema=".[].Table_Info[]",
     content_key="Table_Name",
     metadata_func=metadata_func,
