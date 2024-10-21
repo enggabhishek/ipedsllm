@@ -49,7 +49,7 @@ embedding_function = OpenAIEmbeddings(
 loader = JSONLoader(
     file_path="scripts/data_utils/tableinfo.json",
     jq_schema=".[].Table_Info[]",
-    content_key="Table_Name",
+    content_key="Table_Description",
     metadata_func=metadata_func,
 )
 data = loader.load()
