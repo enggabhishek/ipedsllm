@@ -67,6 +67,10 @@ LANGCHAIN_API_KEY=YOUR_LANGCHAIN_API_KEY
 ```
 
 Replace `YOUR_OPENAI_API_KEY`, `YOUR_DATABASE_URL`, `YOUR_LANGCHAIN_TRACING_V2_SETTING`, `YOUR_LANGCHAIN_ENDPOINT`, and `YOUR_LANGCHAIN_API_KEY` with appropriate values.
+### Creating API keys (fees required)
+To create OPENAI_API_KEY, go to: https://platform.openai.com/usage
+
+To create LANGCHAIN_API_KEY, go to: https://smith.langchain.com/
 
 ### 5. Running the Chatbots
 
