@@ -85,3 +85,5 @@ To run the LlamaIndex chatbot with Streamlit, use the following command:
 ```bash
 streamlit run src/llamaIndex_chat/components/main.py
 ```
+#download model: 
+You can download the embedded model from: https://drive.google.com/drive/folders/1ANo_rGZ_bScGuDaTetj07YjxxFr9CC7G?usp=drive_link

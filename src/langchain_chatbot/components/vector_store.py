@@ -46,6 +46,7 @@ embedding_function = OpenAIEmbeddings(
     openai_api_key=openai_api_key, model="text-embedding-ada-002")
 
 
+
 loader = JSONLoader(
     file_path="scripts/data_utils/tableinfo.json",
     jq_schema=".[].Table_Info[]",
