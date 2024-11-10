@@ -34,20 +34,12 @@ collection= mongo_db.Data
 def get_chain():
     db = SQLDatabase.from_uri(db_url)
     llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
-    
-    context_chain = (
-        RunnableMap({"context": itemgetter("context"), "question": itemgetter("question")})
-        | retriever_prompt
-        | llm
-        | StrOutputParser()
-    )
-    
     generate_query = create_sql_query_chain(llm, db, final_prompt)
     execute_query = QuerySQLDataBaseTool(db=db)
     rephrase_answer = answer_prompt | llm | StrOutputParser()
     
     chain = (
-        RunnablePassthrough.assign(context=context_chain, table_names_to_use=select_table) |
+        RunnablePassthrough.assign(context=itemgetter("context"), table_names_to_use=select_table) |
         RunnablePassthrough.assign(query=generate_query).assign(
             result=itemgetter("query") | execute_query
         )
