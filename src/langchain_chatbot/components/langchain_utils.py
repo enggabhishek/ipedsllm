@@ -49,6 +49,7 @@ def get_chain():
     return chain
 
 
+
 def create_history(messages):
     history = ChatMessageHistory()
     for message in messages:

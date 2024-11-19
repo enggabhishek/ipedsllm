@@ -36,19 +36,19 @@ from llama_index.core import VectorStoreIndex
 # set Logging to DEBUG for more detailed outputs
 table_node_mapping = SQLTableNodeMapping(sql_database)
 table_schema_objs = [  # list of SQLTableSchema objects
-    SQLTableSchema(table_name="ADM2022", context_str=ADM2022_prefix),
-    SQLTableSchema(table_name="HD2022", context_str=HD2022_prefix),
-    SQLTableSchema(table_name="C2022DEP", context_str=C2022_DEP_prefix),
+    SQLTableSchema(table_name="adm2022", context_str=ADM2022_prefix),
+    SQLTableSchema(table_name="hd2022", context_str=HD2022_prefix),
+    SQLTableSchema(table_name="c2022dep", context_str=C2022_DEP_prefix),
     # SQLTableSchema(table_name="C2022_A", context_str=C2022_A_prefix),
     # SQLTableSchema(table_name="C2022_B", context_str=C2022_B_prefix),
     # SQLTableSchema(table_name="C2022_C", context_str=C2022_C_prefix),
-    SQLTableSchema(table_name="EFFY2022", context_str=EFFY_2022_prefix),
+    SQLTableSchema(table_name="effy2022", context_str=EFFY_2022_prefix),
     # SQLTableSchema(table_name="EFFY2022_DIST",
     #                context_str=EFFY2022_DIST_prefix),
     # SQLTableSchema(table_name="EFIA2022", context_str=EFIA2022_prefix),
     # SQLTableSchema(table_name="FLAGS2022", context_str=FLAGS2022_prefix),
     # SQLTableSchema(table_name="GR200_22", context_str=GR200_22_prefix),
-    SQLTableSchema(table_name="GR2022", context_str=GR2022_prefix),
+    SQLTableSchema(table_name="gr2022", context_str=GR2022_prefix),
     # SQLTableSchema(table_name="GR2022_L2", context_str=GR2022_PEL_SSL_prefix),
     # SQLTableSchema(table_name="GR2022_PELL_SSL", context_str=GR2022_prefix),
 

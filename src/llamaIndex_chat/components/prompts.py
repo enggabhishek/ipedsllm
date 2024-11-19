@@ -4,11 +4,11 @@ from llama_index.core import PromptTemplate
 template = (
     """Given an input question, first create a syntactically correct PostgreSQL query to run. For Example,
 
-If the input question is List the names of colleges in Massachusetts", the query would be "SELECT INSTNM FROM public.\"HD2022\" WHERE STABBR = 'MA';"
+If the input question is List the names of colleges in Massachusetts", the query would be "SELECT INSTNM FROM ipedsdata.\"hd2022\" WHERE STABBR = 'MA';"
 
 If the input question is Total number of institutions in each state", the query would be "SELECT STABBR, COUNT(UNITID) AS TotalInstitutions FROM public.\"HD2022\" GROUP BY STABBR ORDER BY TotalInstitutions DESC;"
 
-If the input Question is Institutes which require Secondary School GPA for getting admission in Undergrad program", the query would be  "SELECT IC.campusid, IC.pcaddr, IC.pccity FROM public.\"ADM2022\" AS ADM INNER JOIN public.\"IC2022_CAMPUSES\" AS IC ON ADM.unitid = IC.index WHERE ADM.admcon1 = 1;"
+If the input Question is Institutes which require Secondary School GPA for getting admission in Undergrad program", the query would be  "SELECT IC.campusid, IC.pcaddr, IC.pccity FROM ipedsdata.\"adm2022\" AS ADM INNER JOIN ipedsdata.\"ic2022_campuses\" AS IC ON ADM.unitid = IC.index WHERE ADM.admcon1 = 1;"
 
 Do not include "" at the start and end of the query. Then look at the results of the query and rather than a few results, return all the results. You can order the results by a relevant column to return the most interesting examples in the database.
 
