@@ -7,6 +7,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from prompts import column_name_retriver_prompt, encoded_values_retriver_prompt, column_desc_retriver_prompt
 import re
 import ast
+import concurrent.futures
 import openai
 from dotenv import load_dotenv
 load_dotenv()
@@ -112,76 +113,56 @@ def fetch_value(input_string):
     else:
         return None
 #============================================================================================================
-
 def handle_user_query(question, collection):
+    get_knowledge = vector_search(question, collection)
+    
+    def process_result(result):
+        context = {}
+        column_details = ''
+        output_list = []
+        if result.get('Encoded_Values', '-1') != '-1':
+            context["Table_Name"] = result.get('Table_Name')
+            context["Column_Description"] = result.get('Column_Description')
+            column_details += get_table_info(question, column_name_retriver_prompt, context)
 
-  get_knowledge = vector_search(question, collection)
-  output = "["
-  count_col = 0
-  for result in get_knowledge:
-    context = {}
-    column_details = ''
-    if result.get('Encoded_Values', '-1')!= '-1':
-        
-      context["Table_Name"] = result.get('Table_Name')
-      context["Column_Description"]= result.get('Column_Description')
-      column_details+=get_table_info(question, column_name_retriver_prompt, context)
-      cdesc = ''
-      if "Column names related to the question" in column_details:
-        ls = retrieve_list_objects(patterns[1], column_details)
-        encoded_values=result.get('Encoded_Values')
-        encoded_values=ast.literal_eval(encoded_values)
-        code_value =''
-        
-        for i in ls:
-          if encoded_values.get(i, 'N/A')!= 'N/A':
-            if isinstance(encoded_values.get(i), str):
-              code_value= ast.literal_eval(encoded_values.get(i))
-            elif isinstance(encoded_values.get(i), dict):
-              code_value = encoded_values.get(i)
-            code_value = get_table_info(question, encoded_values_retriver_prompt, code_value)
-            cdesc=get_table_info(i, column_desc_retriver_prompt ,context["Column_Description"])
-            if count_col == 0:
-              count_col+=1
-              output+= "{"+ f"'Table_Name': '{result.get('Table_Name')}' ,'Column_Name': '{i}', 'Column_Description': {get_substring_before_colon(cdesc)} ,'Encoded_Values': {fetch_value(code_value)}" + "}"
+            if "Column names related to the question" in column_details:
+                ls = retrieve_list_objects(patterns[1], column_details)
             else:
-              output+= ", {"+ f"'Table_Name': '{result.get('Table_Name')}' , 'Column_Name': '{i}', 'Column_Description': {get_substring_before_colon(cdesc)}, 'Encoded_Values': {fetch_value(code_value)}" + "}"
-          else:
-            cdesc=get_table_info(i, column_desc_retriver_prompt ,context["Column_Description"])
-            if count_col == 0:
-              count_col+=1
-              output+= "{" + f"'Table_Name': '{result.get('Table_Name')}' ,'Column_Name': '{i}', 'Column_Description': {get_substring_before_colon(cdesc)}" + "}"
-            else:
-              output+= ", {" + f"'Table_Name': '{result.get('Table_Name')}' ,'Column_Name': '{i}', 'Column_Description': {get_substring_before_colon(cdesc)}" + "}"
-        
-      else:
-        ls = ast.literal_eval(column_details)
-        encoded_values=result.get('Encoded_Values')
-        encoded_values=ast.literal_eval(encoded_values)
-        code_value =''
-        for i in ls:
-          if encoded_values.get(i, 'N/A')!= 'N/A':
-            if isinstance(encoded_values.get(i), str):
-              code_value= ast.literal_eval(encoded_values.get(i))
-            elif isinstance(encoded_values.get(i), dict):
-              code_value = encoded_values.get(i)
-            code_value = get_table_info(question, encoded_values_retriver_prompt, code_value)
-            cdesc=get_table_info(i, column_desc_retriver_prompt ,context["Column_Description"])
-            if count_col == 0:
-              count_col+=1
-              output+= "{"+ f"'Table_Name': '{result.get('Table_Name')}' , 'Column_Name': '{i}', 'Column_Description': {get_substring_before_colon(cdesc)} , 'Encoded_Values': {fetch_value(code_value)}" + "}"
-            else:
-              output+= ", {"+ f"'Table_Name': '{result.get('Table_Name')}' , 'Column_Name': '{i}', 'Column_Description': {get_substring_before_colon(cdesc)}, 'Encoded_Values': {fetch_value(code_value)}" + "}"
-          else:
-            cdesc=get_table_info(i, column_desc_retriver_prompt ,context["Column_Description"])
-            if count_col == 0:
-              count_col+=1
-              output+= "{" + f"'Table_Name': '{result.get('Table_Name')}' ,'Column_Name': '{i}', 'Column_Description': {get_substring_before_colon(cdesc)}" + "}"
-            else:
-              output+= ", {" + f"'Table_Name': '{result.get('Table_Name')}' , 'Column_Name': '{i}', 'Column_Description': {get_substring_before_colon(cdesc)}" + "}"
-  output += "]"
-  return output
+                ls = ast.literal_eval(column_details)
+            
+            encoded_values = ast.literal_eval(result.get('Encoded_Values', '{}'))
+            
+            for i in ls:
+                cdesc = get_table_info(i, column_desc_retriver_prompt, context["Column_Description"])
+                if encoded_values.get(i, 'N/A') != 'N/A':
+                    code_value = encoded_values.get(i)
+                    if isinstance(code_value, str):
+                        code_value = ast.literal_eval(code_value)
+                    elif isinstance(code_value, dict):
+                        pass
+                    code_value = get_table_info(question, encoded_values_retriver_prompt, code_value)
+                    output_list.append({
+                        "Table_Name": result.get('Table_Name'),
+                        "Column_Name": i,
+                        "Column_Description": get_substring_before_colon(cdesc),
+                        "Encoded_Values": fetch_value(code_value)
+                    })
+                else:
+                    output_list.append({
+                        "Table_Name": result.get('Table_Name'),
+                        "Column_Name": i,
+                        "Column_Description": get_substring_before_colon(cdesc)
+                    })
+        return output_list
 
+    # Multithreading for processing results
+    output = []
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = [executor.submit(process_result, result) for result in get_knowledge]
+        for future in concurrent.futures.as_completed(futures):
+            output.extend(future.result())
+
+    return output
 
 llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0)
 
