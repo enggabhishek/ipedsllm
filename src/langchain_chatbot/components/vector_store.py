@@ -1,5 +1,4 @@
 from langchain.prompts import ChatPromptTemplate
-import streamlit as st
 from langchain_openai import ChatOpenAI
 from langchain_core.runnables import RunnablePassthrough,RunnableMap
 from langchain_core.output_parsers import StrOutputParser
@@ -163,20 +162,3 @@ def handle_user_query(question, collection):
             output.extend(future.result())
 
     return output
-
-llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0)
-
-template = """Answer the question based solely on the following context:
-{context}
-Extract all relevant table names, column names, column descriptions, and encoded values (if available) from the context based on the question. Include all pertinent tables, column descriptions, column names, and encoded values, which will be used by the downstream Text-to-SQL Agent to generate SQL queries for answers.
-Perform the following tasks:
-1. Identify Table Names
-2. Identify Column Names
-3. Identify Column Descriptions
-4. Identify Encoded Values
-
-Finally, return only the table names, Column Descriptions, column names, and encoded values (if available).
-
-Question: {question}
-    """
-retriever_prompt = ChatPromptTemplate.from_template(template)
