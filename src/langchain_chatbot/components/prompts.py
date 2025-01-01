@@ -1,4 +1,3 @@
-# from examples import get_example_selector
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, PromptTemplate
 
 example_prompt = ChatPromptTemplate.from_messages(
@@ -28,6 +27,22 @@ final_prompt = ChatPromptTemplate.from_messages(
         ("human", "{input}"),
     ]
 )
+
+vector_search_template = """Answer the question based only on the following context:
+    {context}
+    Search for the table descriptions in the context and accordingly search for column names and associated column description. Include only relevant tables and columns which can be used by the downstream Text-to-SQL Agent to create SQL Queries for generating answer.
+    Search for any information performing the following tasks:
+    1. Table Names
+    2. Table Descriptions
+    3. Column Names
+    4. Column Descriptions
+    5. Encoded Values
+    Finally, only return table names, column names and Encoded Values only (if availabe).
+
+    Question: {question}
+    """
+
+retriever_prompt = ChatPromptTemplate.from_template(vector_search_template)
 
 answer_prompt = PromptTemplate.from_template(
     """Given the following user question, corresponding SQL query, and SQL result, answer the user question.
